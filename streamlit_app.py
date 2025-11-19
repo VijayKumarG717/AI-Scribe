@@ -18,13 +18,23 @@ def main():
         <style>
         /* Overall page background */
         html, body, [data-testid="stAppViewContainer"], .main, .block-container {
-            background: radial-gradient(circle at top left, #020617 0, #020617 40%, #020617 100%) !important;
+            background:
+                radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 55%),
+                radial-gradient(circle at bottom right, rgba(129,140,248,0.22), transparent 55%),
+                #020617 !important;
             color: #e5e7eb;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+        }
+        [data-testid="stHeader"] {
+            background: transparent !important;
+        }
+        .block-container {
+            padding-top: 1.6rem;
         }
         .ai-scribe-header {
             padding: 1.25rem 1.5rem;
             border-radius: 0.9rem;
-            background: linear-gradient(135deg, rgba(59,130,246,0.32), rgba(56,189,248,0.14));
+            background: radial-gradient(circle at top left, rgba(59,130,246,0.42), rgba(56,189,248,0.12));
             border: 1px solid rgba(148,163,184,0.45);
             box-shadow: 0 22px 55px rgba(15,23,42,0.85);
             backdrop-filter: blur(14px);
@@ -64,6 +74,51 @@ def main():
             text-transform: uppercase;
             letter-spacing: 0.08em;
             color: #9ca3af;
+        }
+        /* Sidebar */
+        [data-testid="stSidebar"] > div {
+            background: radial-gradient(circle at top left, rgba(15,23,42,0.96), rgba(15,23,42,0.96));
+            border-right: 1px solid rgba(31,41,55,0.9);
+        }
+        .sidebar-card {
+            padding: 1.1rem 1rem;
+            border-radius: 0.9rem;
+            background: radial-gradient(circle at top left, rgba(15,23,42,0.98), rgba(15,23,42,0.9));
+            border: 1px solid rgba(31,41,55,0.95);
+            box-shadow: 0 18px 40px rgba(15,23,42,0.9);
+        }
+        .sidebar-card h3 {
+            margin-top: 0;
+            margin-bottom: 0.4rem;
+            font-size: 1rem;
+        }
+        .sidebar-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.1rem 0.6rem;
+            border-radius: 999px;
+            background: rgba(15,23,42,0.9);
+            border: 1px solid rgba(55,65,81,0.9);
+            font-size: 0.72rem;
+            color: #9ca3af;
+        }
+        .sidebar-step {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 0.25rem;
+        }
+        .sidebar-step span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.05rem;
+            height: 1.05rem;
+            border-radius: 999px;
+            background: rgba(31,41,55,0.95);
+            color: #e5e7eb;
+            font-size: 0.72rem;
+            margin-right: 0.35rem;
         }
         /* Buttons */
         .stButton>button {
@@ -112,22 +167,47 @@ def main():
         [data-testid="stFileUploader"] section {
             color: #9ca3af;
         }
+        /* Tabs */
+        [data-baseweb="tab-list"] {
+            border-radius: 999px;
+            padding: 0.25rem;
+            background: radial-gradient(circle at top left, rgba(15,23,42,0.98), rgba(17,24,39,0.98));
+            border: 1px solid rgba(31,41,55,0.95);
+        }
+        [data-baseweb="tab"] {
+            border-radius: 999px !important;
+            padding: 0.35rem 0.9rem !important;
+            color: #9ca3af !important;
+            font-size: 0.86rem !important;
+        }
+        [aria-selected="true"][data-baseweb="tab"] {
+            background: linear-gradient(135deg, rgba(59,130,246,0.9), rgba(56,189,248,0.9)) !important;
+            color: #f9fafb !important;
+            box-shadow: 0 12px 30px rgba(37,99,235,0.6);
+        }
         </style>
         """,
         unsafe_allow_html=True,
     )
 
     with st.sidebar:
-        st.markdown("### AI Scribe")
         st.markdown(
-            "Generate structured clinical documentation from audio or text using AssemblyAI and Gemini."
+            """
+            <div class="sidebar-card">
+                <div class="sidebar-pill">AI-powered clinical documentation</div>
+                <h3>AI Scribe</h3>
+                <p style="font-size: 0.86rem; color: #9ca3af; margin-bottom: 0.75rem;">
+                    Turn raw consultation audio or free text into clear, structured clinical notes ready for your EHR.
+                </p>
+                <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280; margin-bottom: 0.35rem;">Workflow</div>
+                <div class="sidebar-step"><span>1</span>Choose template type</div>
+                <div class="sidebar-step"><span>2</span>Upload audio or paste text</div>
+                <div class="sidebar-step"><span>3</span>Generate & refine the note</div>
+                <div class="sidebar-step"><span>4</span>Download or paste into your system</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
-        st.divider()
-        st.markdown("**Workflow**")
-        st.markdown("1. Choose template type")
-        st.markdown("2. Upload audio or paste text")
-        st.markdown("3. Generate and review note")
-        st.markdown("4. Download for your records")
 
     header_col, template_col = st.columns([3, 2])
 
