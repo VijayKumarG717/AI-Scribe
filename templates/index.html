@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Scribe - Clinical Documentation Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@heroicons/react@2.0.18/24/outline/index.js" type="module"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(129, 140, 248, 0.35), transparent 55%),
+                radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.3), transparent 55%),
+                #020617;
+            color: #e5e7eb;
+        }
+        
+        .glass {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.8);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .drag-over {
+            border-color: #a5b4fc;
+            background: rgba(129, 140, 248, 0.14);
+        }
+        
+        .subheading {
+            letter-spacing: 0.08em;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8 px-4">
+    <!-- Header -->
+    <header class="text-center mb-8 fade-in">
+        <p class="subheading text-xs font-semibold uppercase tracking-[0.2em] text-sky-300/80 mb-2">Clinical AI Workspace</p>
+        <h1 class="text-4xl md:text-5xl font-semibold text-white mb-2">AI Scribe</h1>
+        <p class="text-sm md:text-base text-slate-200/80 max-w-xl mx-auto">Generate structured SOAP or H&amp;P notes from clinical encounters while keeping every detail faithful to the original transcript.</p>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto">
+        <div class="glass rounded-2xl p-8 mb-6 fade-in">
+            <!-- Input Type Dropdown -->
+            <div class="mb-6">
+                <label for="input_type" class="block text-white font-semibold mb-2 text-lg">
+                    <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Choose Input Type
+                </label>
+                <select id="input_type" name="input_type" class="w-full px-4 py-3 rounded-lg bg-white/30 backdrop-blur-sm border border-white/40 text-white font-medium focus:outline-none focus:ring-2 focus:ring-white/50 transition-all">
+                    <option value="audio" class="text-gray-800">Upload Audio</option>
+                    <option value="text" class="text-gray-800">Upload Text</option>
+                </select>
+            </div>
+
+            <!-- Template Type Dropdown -->
+            <div class="mb-6">
+                <label for="template_type" class="block text-white font-semibold mb-2 text-lg">
+                    <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Choose Template Style
+                </label>
+                <select id="template_type" name="template_type" class="w-full px-4 py-3 rounded-lg bg-white/30 backdrop-blur-sm border border-white/40 text-white font-medium focus:outline-none focus:ring-2 focus:ring-white/50 transition-all">
+                    <option value="SOAP Note" class="text-gray-800">SOAP Note</option>
+                    <option value="H&P Note" class="text-gray-800">H&P Note</option>
+                </select>
+            </div>
+
+            <!-- Audio Upload Section -->
+            <div id="audio_section" class="mb-6 fade-in">
+                <form id="audio_form" enctype="multipart/form-data" method="POST" action="{{ url_for('process_audio') }}">
+                    <input type="hidden" name="template_type" id="audio_template_type">
+                    <label class="block text-white font-semibold mb-3 text-lg">
+                        <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                        </svg>
+                        Upload Audio File
+                    </label>
+                    <div id="audio_dropzone" class="border-2 border-dashed border-white/40 rounded-xl p-8 text-center cursor-pointer transition-all hover:border-white/60 hover:bg-white/10">
+                        <input type="file" id="audio_file" name="audio_file" accept=".mp3,.wav,.m4a" class="hidden">
+                        <svg class="mx-auto h-12 w-12 text-white/70 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <p class="text-white/90 mb-2">
+                            <span class="font-semibold">Click to upload</span> or drag and drop
+                        </p>
+                        <p class="text-white/70 text-sm">MP3, WAV, or M4A (Max 100MB)</p>
+                        <p id="audio_filename" class="text-white/90 mt-3 font-medium hidden"></p>
+                    </div>
+                    <button type="submit" id="transcribe_btn" class="w-full mt-4 px-6 py-3 bg-white/30 hover:bg-white/40 text-white font-semibold rounded-lg transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                        </svg>
+                        Transcribe
+                    </button>
+                    <div id="audio_loading" class="hidden mt-4 text-center">
+                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                        <p class="text-white/90 mt-2">Processing audio...</p>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Text Upload Section -->
+            <div id="text_section" class="mb-6 fade-in hidden">
+                <form id="text_form" method="POST" action="{{ url_for('process_text') }}">
+                    <input type="hidden" name="template_type" id="text_template_type">
+                    <label class="block text-white font-semibold mb-3 text-lg">
+                        <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Enter or Upload Text
+                    </label>
+                    <textarea id="text_input" name="text_input" rows="8" class="w-full px-4 py-3 rounded-lg bg-white/30 backdrop-blur-sm border border-white/40 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50 resize-none transition-all" placeholder="Paste your clinical notes here..."></textarea>
+                    
+                    <div class="mt-4">
+                        <div id="text_dropzone" class="border-2 border-dashed border-white/40 rounded-xl p-6 text-center cursor-pointer transition-all hover:border-white/60 hover:bg-white/10">
+                            <input type="file" id="text_file" name="text_file" accept=".txt,.docx" class="hidden">
+                            <svg class="mx-auto h-10 w-10 text-white/70 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="text-white/90 text-sm mb-1">
+                                <span class="font-semibold">Or upload a file</span>
+                            </p>
+                            <p class="text-white/70 text-xs">TXT or DOCX</p>
+                            <p id="text_filename" class="text-white/90 mt-2 font-medium text-sm hidden"></p>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" id="process_text_btn" class="w-full mt-4 px-6 py-3 bg-white/30 hover:bg-white/40 text-white font-semibold rounded-lg transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Process Text
+                    </button>
+                    <div id="text_loading" class="hidden mt-4 text-center">
+                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                        <p class="text-white/90 mt-2">Processing text...</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center mt-8 fade-in">
+        <p class="text-white/70 text-sm">AI Scribe - Clinical Documentation Assistant</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+

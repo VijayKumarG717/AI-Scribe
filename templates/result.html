@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Scribe - Results</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(129, 140, 248, 0.35), transparent 55%),
+                radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.3), transparent 55%),
+                #020617;
+            color: #e5e7eb;
+        }
+        
+        .glass {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.8);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .subheading {
+            letter-spacing: 0.08em;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8 px-4">
+    <!-- Header -->
+    <header class="text-center mb-8 fade-in">
+        <p class="subheading text-xs font-semibold uppercase tracking-[0.2em] text-sky-300/80 mb-2">Generated Clinical Note</p>
+        <h1 class="text-4xl md:text-5xl font-semibold text-white mb-2">AI Scribe Results</h1>
+        <p class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/70 border border-sky-400/40 text-xs font-medium text-sky-100">Template: <span class="font-semibold text-sky-300">{{ template_type }}</span></p>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto">
+        <!-- Two Column Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Original Text Card -->
+            <div class="glass rounded-2xl p-6 fade-in">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-white">
+                        <svg class="inline-block w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Original Text/Transcript
+                    </h2>
+                    <button onclick="copyToClipboard('original_text')" class="px-4 py-2 bg-white/30 hover:bg-white/40 text-white font-medium rounded-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50">
+                        <svg class="inline-block w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+                <div class="bg-white/20 rounded-lg p-4 max-h-96 overflow-y-auto">
+                    <pre id="original_text" class="text-white/90 whitespace-pre-wrap">{{ original_text }}</pre>
+                </div>
+                <form method="POST" action="{{ url_for('download') }}" class="mt-4">
+                    <input type="hidden" name="content" value="{{ original_text }}">
+                    <input type="hidden" name="filename" value="original_text.txt">
+                    <button type="submit" class="w-full px-4 py-2 bg-white/30 hover:bg-white/40 text-white font-medium rounded-lg transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-white/50">
+                        <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Download as TXT
+                    </button>
+                </form>
+            </div>
+
+            <!-- AI Scribe Output Card -->
+            <div class="glass rounded-2xl p-6 fade-in">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-white">
+                        <svg class="inline-block w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                        AI Scribe Output
+                    </h2>
+                    <button onclick="copyToClipboard('formatted_output')" class="px-4 py-2 bg-white/30 hover:bg-white/40 text-white font-medium rounded-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50">
+                        <svg class="inline-block w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+                <div class="bg-white/20 rounded-lg p-4 max-h-96 overflow-y-auto">
+                    <pre id="formatted_output" class="text-white/90 whitespace-pre-wrap">{{ formatted_output }}</pre>
+                </div>
+                <form method="POST" action="{{ url_for('download') }}" class="mt-4">
+                    <input type="hidden" name="content" value="{{ formatted_output }}">
+                    <input type="hidden" name="filename" value="ai_scribe_output.txt">
+                    <button type="submit" class="w-full px-4 py-2 bg-white/30 hover:bg-white/40 text-white font-medium rounded-lg transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-white/50">
+                        <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Download as TXT
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Back to Home Button -->
+        <div class="text-center fade-in">
+            <a href="{{ url_for('index') }}" class="inline-block px-8 py-3 bg-white/30 hover:bg-white/40 text-white font-semibold rounded-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50">
+                <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent || element.innerText;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                // Visual feedback
+                const button = event.target.closest('button');
+                const originalText = button.innerHTML;
+                button.innerHTML = '<svg class="inline-block w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Copied!';
+                button.classList.add('bg-green-500/50');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('bg-green-500/50');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+    </script>
+</body>
+</html>
+
